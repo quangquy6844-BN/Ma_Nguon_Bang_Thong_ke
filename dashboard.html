@@ -1,0 +1,219 @@
+
+{% extends "base.html" %}
+
+{% block title %}Tổng quan{% endblock %}
+
+{% block page_heading %}Tổng quan{% endblock %}
+
+{% block content %}
+
+<div class="page-intro">
+
+    <div>
+        <h2>Xin chào, Quản trị viên 👋</h2>
+        <p>Theo dõi tình hình kinh doanh của bạn tại đây.</p>
+    </div>
+
+    <a href="{% url 'revenues' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i>
+        Thêm doanh thu
+    </a>
+
+</div>
+
+
+<!-- THỐNG KÊ -->
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-3">
+        <div class="metric-card">
+            <p>Tổng doanh thu tháng</p>
+            <h3>86.500.000 đ</h3>
+            <span class="text-success">
+                <i class="bi bi-arrow-up"></i>
+                12,8% so với tháng trước
+            </span>
+        </div>
+    </div>
+
+
+    <div class="col-md-3">
+        <div class="metric-card">
+            <p>Doanh thu hôm nay</p>
+            <h3>3.250.000 đ</h3>
+            <span class="text-muted">Cập nhật trong ngày</span>
+        </div>
+    </div>
+
+
+    <div class="col-md-3">
+        <div class="metric-card">
+            <p>Số giao dịch</p>
+            <h3>248</h3>
+            <span class="text-success">8,2% so với tháng trước</span>
+        </div>
+    </div>
+
+
+    <div class="col-md-3">
+        <div class="metric-card">
+            <p>Doanh thu bình quân</p>
+            <h3>2.883.000 đ</h3>
+            <span class="text-muted">Trên mỗi ngày hoạt động</span>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- BIỂU ĐỒ -->
+
+<div class="row g-3">
+
+    <div class="col-lg-8">
+
+        <div class="panel">
+
+            <h5>Doanh thu theo thời gian</h5>
+
+            <p class="text-muted">
+                Thống kê doanh thu trong 7 ngày gần nhất
+            </p>
+
+            <canvas id="revenueChart" height="120"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-lg-4">
+
+        <div class="panel">
+
+            <h5>Phân loại doanh thu</h5>
+
+            <p class="text-muted">
+                Theo nhóm hoạt động
+            </p>
+
+            <canvas id="categoryChart"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- GIAO DỊCH GẦN ĐÂY -->
+
+<div class="panel mt-4">
+
+    <h5>Giao dịch gần đây</h5>
+
+    <div class="table-responsive">
+
+        <table class="table table-hover">
+
+            <thead>
+                <tr>
+                    <th>Ngày</th>
+                    <th>Nội dung</th>
+                    <th>Nhóm doanh thu</th>
+                    <th class="text-end">Số tiền</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>10/11/2026</td>
+                    <td>Bán hàng tại cửa hàng</td>
+                    <td>Bán hàng hóa</td>
+                    <td class="text-end">1.850.000 đ</td>
+                </tr>
+
+                <tr>
+                    <td>10/11/2026</td>
+                    <td>Doanh thu dịch vụ</td>
+                    <td>Dịch vụ</td>
+                    <td class="text-end">900.000 đ</td>
+                </tr>
+
+                <tr>
+                    <td>09/11/2026</td>
+                    <td>Bán hàng cuối ngày</td>
+                    <td>Bán hàng hóa</td>
+                    <td class="text-end">2.400.000 đ</td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const revenueCanvas = document.getElementById('revenueChart');
+
+new Chart(revenueCanvas, {
+    type: 'line',
+
+    data: {
+        labels: ['04/11', '05/11', '06/11', '07/11', '08/11', '09/11', '10/11'],
+
+        datasets: [{
+            label: 'Doanh thu',
+            data: [1800000, 2500000, 2100000, 3200000, 2800000, 4000000, 4500000],
+            borderColor: '#6558d3',
+            backgroundColor: 'rgba(101,88,211,0.12)',
+            fill: true,
+            tension: 0.4
+        }]
+    },
+
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+
+
+new Chart(document.getElementById('categoryChart'), {
+    type: 'doughnut',
+
+    data: {
+        labels: ['Bán hàng hóa', 'Dịch vụ', 'Hoạt động khác'],
+
+        datasets: [{
+            data: [58000000, 18500000, 10000000],
+            backgroundColor: ['#6558d3', '#64a8e8', '#f3a56f']
+        }]
+    },
+
+    options: {
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
+
+{% endblock %}
