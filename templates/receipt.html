@@ -1,0 +1,80 @@
+{% extends 'index.html' %}
+
+{% block title %}{{ sale.receipt_no }} · Bill{% endblock %}
+
+{% block content %}
+<div class="no-print d-flex justify-content-between mb-3">
+  <a class="btn btn-light" href="index.html">
+    ← Quay lại
+  </a>
+
+  <button class="btn btn-primary" onclick="window.print()">
+    In bill
+  </button>
+</div>
+
+<article class="receipt">
+  <div class="text-center">
+    <h1>{{ sale.shop_name }}</h1>
+
+    {% if sale.address %}
+      <div>{{ sale.address }}</div>
+    {% endif %}
+
+    {% if sale.tax_code %}
+      <div>MST: {{ sale.tax_code }}</div>
+    {% endif %}
+
+    {% if sale.business %}
+      <div>{{ sale.business }}</div>
+    {% endif %}
+
+    <hr>
+
+    <h2>PHIẾU BÁN HÀNG</h2>
+    <div>{{ sale.receipt_no }}</div>
+  </div>
+
+  <div class="mt-3">
+    Thời gian: {{ sale.created_at[:16].replace('T', ' ') }}<br>
+    Khách hàng: {{ sale.customer or 'Khách lẻ' }}
+  </div>
+
+  <table class="table table-sm mt-3">
+    <thead>
+      <tr>
+        <th>Mặt hàng</th>
+        <th class="text-center">SL</th>
+        <th class="text-end">Đơn giá</th>
+        <th class="text-end">Thành tiền</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.name }}</td>
+        <td class="text-center">{{ item.quantity }}</td>
+        <td class="text-end">
+          {{ '{:,.0f}'.format(item.unit_price) }}
+        </td>
+        <td class="text-end">
+          {{ '{:,.0f}'.format(item.line_total) }}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="d-flex justify-content-between fs-5 fw-bold border-top pt-3">
+    <span>TỔNG CỘNG</span>
+    <span>{{ '{:,.0f}'.format(sale.total) }} ₫</span>
+  </div>
+
+  <p class="text-center mt-4 mb-0">Cảm ơn quý khách!</p>
+
+  <p class="text-center small text-secondary mt-3">
+    Phiếu bán hàng nội bộ · Không thay thế hóa đơn điện tử
+  </p>
+</article>
+{% endblock %}

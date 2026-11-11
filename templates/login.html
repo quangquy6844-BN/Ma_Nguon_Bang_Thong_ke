@@ -1,0 +1,53 @@
+{% extends 'index.html' %}
+
+{% block title %}Đăng nhập · Sổ doanh thu{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center login-area">
+  <div class="col-md-7 col-lg-5">
+    <div class="card border-0 shadow-lg rounded-4">
+      <div class="card-body p-4 p-md-5">
+        <div class="brand-icon mb-3">SD</div>
+
+        <p class="text-primary fw-semibold mb-1">
+          QUẢN LÝ HỘ KINH DOANH
+        </p>
+
+        <h1 class="h3 fw-bold mb-2">Đăng nhập hệ thống</h1>
+        <p class="text-secondary mb-4">
+          Theo dõi doanh thu và lập phiếu bán hàng.
+        </p>
+
+        <form method="post">
+          <label class="form-label">Tên đăng nhập</label>
+          <input
+            class="form-control form-control-lg mb-3"
+            name="username"
+            required
+            autofocus
+          >
+
+          <label class="form-label">Mật khẩu</label>
+          <input
+            class="form-control form-control-lg mb-4"
+            type="password"
+            name="password"
+            required
+          >
+
+          <button class="btn btn-primary btn-lg w-100">
+            Đăng nhập
+          </button>
+        </form>
+
+        <div class="small text-secondary mt-4">
+          Tài khoản mẫu:
+          <code>admin / admin123</code>
+          hoặc
+          <code>cuahang / shop123</code>.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

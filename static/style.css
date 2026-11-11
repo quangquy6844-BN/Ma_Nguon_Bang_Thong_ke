@@ -1,0 +1,149 @@
+:root {
+  --ink: #15233b;
+  --blue: #2263d2;
+  --soft: #f3f6fb;
+}
+
+body {
+  color: var(--ink);
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+.app-bg {
+  background: var(--soft);
+  min-height: 100vh;
+}
+
+.topbar {
+  background: #142746;
+}
+
+.navbar-brand {
+  letter-spacing: 0.2px;
+}
+
+.card {
+  border-radius: 16px;
+}
+
+.form-control,
+.form-select {
+  border-color: #dce3ed;
+  padding: 0.7rem 0.85rem;
+}
+
+.btn-primary {
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  font-weight: 800;
+  color: var(--blue);
+  margin-bottom: 0.45rem;
+}
+
+.stat-card {
+  height: 100%;
+  padding: 1.35rem 1.5rem;
+  background: #fff;
+  border: 1px solid #e8edf4;
+  border-radius: 16px;
+  box-shadow: 0 5px 18px #2035520b;
+}
+
+.stat-card span,
+.stat-card small {
+  display: block;
+  color: #66748a;
+}
+
+.stat-card strong {
+  display: block;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1.3;
+  margin: 0.45rem 0;
+}
+
+.brand-icon {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 15px;
+  background: #e7efff;
+  color: var(--blue);
+  font-weight: 800;
+}
+
+.login-area {
+  min-height: 72vh;
+}
+
+.table > :not(caption) > * > * {
+  padding: 0.75rem 0.55rem;
+}
+
+.receipt {
+  max-width: 760px;
+  margin: 0 auto;
+  background: white;
+  padding: 48px 54px;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px #14274618;
+}
+
+.receipt h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.receipt h2 {
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+  font-weight: 800;
+}
+
+.receipt hr {
+  border-top: 1px dashed #687386;
+  opacity: 0.7;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
+  body,
+  .app-bg {
+    background: #fff !important;
+  }
+
+  .container {
+    max-width: none !important;
+    width: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .no-print,
+  nav,
+  .alert {
+    display: none !important;
+  }
+
+  .receipt {
+    max-width: none;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .table {
+    --bs-table-bg: transparent;
+  }
+}

@@ -1,0 +1,151 @@
+{% extends 'index.html' %}
+
+{% block title %}Tạo bill · Sổ doanh thu{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <p class="eyebrow">{{ user.shop_name }}</p>
+  <h1 class="h2 fw-bold">Tạo phiếu bán hàng</h1>
+  <p class="text-secondary">
+    Nhập mặt hàng và đơn giá. Sau khi lưu, bạn có thể xem và in bill.
+  </p>
+</div>
+
+<form method="post">
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+      <label class="form-label">
+        Tên khách hàng
+        <span class="text-secondary">(không bắt buộc)</span>
+      </label>
+      <input
+        name="customer"
+        class="form-control"
+        placeholder="Khách lẻ"
+      >
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 fw-bold mb-0">Danh sách mặt hàng</h2>
+        <button class="btn btn-outline-primary btn-sm" type="button" id="add-row">
+          + Thêm mặt hàng
+        </button>
+      </div>
+
+      <div class="row g-2 text-secondary small mb-2 d-none d-md-flex">
+        <div class="col-md-5">TÊN MẶT HÀNG</div>
+        <div class="col-md-2">SỐ LƯỢNG</div>
+        <div class="col-md-3">ĐƠN GIÁ (₫)</div>
+        <div class="col-md-2"></div>
+      </div>
+
+      <div id="items">
+        <div class="row g-2 align-items-center item-row mb-2">
+          <div class="col-12 col-md-5">
+            <input
+              class="form-control"
+              name="item_name[]"
+              placeholder="Ví dụ: Cà phê"
+              required
+            >
+          </div>
+
+          <div class="col-4 col-md-2">
+            <input
+              class="form-control qty"
+              type="number"
+              name="quantity[]"
+              min="1"
+              value="1"
+              required
+            >
+          </div>
+
+          <div class="col-6 col-md-3">
+            <input
+              class="form-control price"
+              type="number"
+              name="unit_price[]"
+              min="0"
+              step="1000"
+              placeholder="0"
+              required
+            >
+          </div>
+
+          <div class="col-2 col-md-2">
+            <button class="btn btn-outline-danger remove-row" type="button">
+              ×
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Tạm tính</span>
+        <span id="grand-total" class="h4 fw-bold text-primary mb-0">0 ₫</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2 mt-4">
+    <button class="btn btn-primary btn-lg">Lưu và xem bill</button>
+    <a class="btn btn-light btn-lg" href="{{ url_for('shop_dashboard') }}">
+      Huỷ
+    </a>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const itemsContainer = document.querySelector("#items");
+  const addButton = document.querySelector("#add-row");
+  const totalElement = document.querySelector("#grand-total");
+
+  function updateTotal() {
+    let total = 0;
+
+    document.querySelectorAll(".item-row").forEach((row) => {
+      const quantity = Number(row.querySelector(".qty").value) || 0;
+      const price = Number(row.querySelector(".price").value) || 0;
+      total += quantity * price;
+    });
+
+    totalElement.textContent =
+      new Intl.NumberFormat("vi-VN").format(total) + " ₫";
+  }
+
+  addButton.addEventListener("click", () => {
+    const originalRow = document.querySelector(".item-row");
+    const newRow = originalRow.cloneNode(true);
+
+    newRow.querySelector('[name="item_name[]"]').value = "";
+    newRow.querySelector(".qty").value = 1;
+    newRow.querySelector(".price").value = "";
+
+    itemsContainer.appendChild(newRow);
+    updateTotal();
+  });
+
+  itemsContainer.addEventListener("input", updateTotal);
+
+  itemsContainer.addEventListener("click", (event) => {
+    if (!event.target.classList.contains("remove-row")) {
+      return;
+    }
+
+    const rows = document.querySelectorAll(".item-row");
+
+    if (rows.length > 1) {
+      event.target.closest(".item-row").remove();
+      updateTotal();
+    }
+  });
+</script>
+{% endblock %}

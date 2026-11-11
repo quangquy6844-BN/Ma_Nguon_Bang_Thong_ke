@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}Cửa hàng · Sổ doanh thu{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+  <div>
+    <p class="eyebrow">{{ user.shop_name }}</p>
+    <h1 class="h2 fw-bold mb-1">Tổng quan cửa hàng</h1>
+    <div class="text-secondary">
+      Ghi nhận bán hàng và theo dõi doanh thu.
+    </div>
+  </div>
+
+  <a href="new_sale.html" class="btn btn-primary btn-lg">
+    + Tạo bill mới
+  </a>
+</div>
+
+<form class="card card-body border-0 shadow-sm mb-4" method="get">
+  <div class="row g-2 align-items-end">
+    <div class="col-sm-4 col-lg-3">
+      <label class="form-label">Thống kê theo</label>
+      <select class="form-select" name="period" id="period">
+        <option value="day" {% if period == 'day' %}selected{% endif %}>
+          Ngày
+        </option>
+        <option value="month" {% if period == 'month' %}selected{% endif %}>
+          Tháng
+        </option>
+        <option value="year" {% if period == 'year' %}selected{% endif %}>
+          Năm
+        </option>
+      </select>
+    </div>
+
+    <div class="col-sm-5 col-lg-4">
+      <label class="form-label">Kỳ báo cáo</label>
+      <input
+        class="form-control"
+        id="value"
+        name="value"
+        value="{{ value }}"
+        required
+      >
+    </div>
+
+    <div class="col-sm-3">
+      <button class="btn btn-dark w-100">Xem báo cáo</button>
+    </div>
+  </div>
+</form>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="stat-card">
+      <span>Doanh thu kỳ này</span>
+      <strong>{{ '{:,.0f}'.format(totals.revenue) }} ₫</strong>
+      <small>theo thời gian đã chọn</small>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="stat-card">
+      <span>Số phiếu bán</span>
+      <strong>{{ totals.orders }}</strong>
+      <small>trong kỳ đã chọn</small>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="h5 fw-bold mb-0">Giao dịch gần đây</h2>
+      <a href="new_sale.html">Tạo phiếu bán →</a>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Mã bill</th>
+            <th>Thời gian</th>
+            <th>Khách hàng</th>
+            <th class="text-end">Tổng tiền</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for sale in recent %}
+          <tr>
+            <td class="fw-semibold">{{ sale.receipt_no }}</td>
+            <td>{{ sale.created_at[:16].replace('T', ' ') }}</td>
+            <td>{{ sale.customer or 'Khách lẻ' }}</td>
+            <td class="text-end">
+              {{ '{:,.0f}'.format(sale.total) }} ₫
+            </td>
+            <td>
+              <a
+                class="btn btn-sm btn-outline-primary"
+                href="{{ url_for('receipt', sale_id=sale.id) }}"
+              >
+                Xem bill
+              </a>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="text-secondary">
+              Chưa có giao dịch.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const periodInput = document.querySelector("#period");
+  const valueInput = document.querySelector("#value");
+
+  function updatePeriodInput() {
+    if (periodInput.value === "day") {
+      valueInput.type = "date";
+    } else if (periodInput.value === "month") {
+      valueInput.type = "month";
+    } else {
+      valueInput.type = "number";
+      valueInput.min = "2000";
+      valueInput.max = "2100";
+    }
+  }
+
+  periodInput.addEventListener("change", updatePeriodInput);
+  updatePeriodInput();
+</script>
+{% endblock %}

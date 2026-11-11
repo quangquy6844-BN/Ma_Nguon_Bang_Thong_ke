@@ -1,0 +1,110 @@
+{% extends 'index.html' %}
+
+{% block title %}Cửa hàng · Sổ doanh thu{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <p class="eyebrow">QUẢN TRỊ</p>
+  <h1 class="h2 fw-bold">Quản lý cửa hàng</h1>
+  <p class="text-secondary">
+    Tạo tài khoản để cửa hàng đăng nhập và ghi nhận doanh thu.
+  </p>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <h2 class="h5 fw-bold mb-3">Thêm cửa hàng</h2>
+
+        <form method="post">
+          <label class="form-label">Tên cửa hàng / hộ kinh doanh</label>
+          <input name="shop_name" class="form-control mb-3" required>
+
+          <div class="row">
+            <div class="col-md-6">
+              <label class="form-label">Tên đăng nhập</label>
+              <input name="username" class="form-control mb-3" required>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Mật khẩu ban đầu</label>
+              <input
+                name="password"
+                type="password"
+                minlength="6"
+                class="form-control mb-3"
+                required
+              >
+            </div>
+          </div>
+
+          <label class="form-label">Địa chỉ</label>
+          <input name="address" class="form-control mb-3">
+
+          <div class="row">
+            <div class="col-md-6">
+              <label class="form-label">Mã số thuế</label>
+              <input name="tax_code" class="form-control mb-3">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Ngành nghề</label>
+              <input name="business" class="form-control mb-3">
+            </div>
+          </div>
+
+          <button class="btn btn-primary">
+            Tạo tài khoản cửa hàng
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h5 fw-bold mb-3">Danh sách cửa hàng</h2>
+
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>Cửa hàng</th>
+                <th>Tài khoản</th>
+                <th>Phiếu</th>
+                <th class="text-end">Doanh thu</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for shop in shops %}
+              <tr>
+                <td>
+                  <div class="fw-semibold">{{ shop.shop_name }}</div>
+                  <small class="text-secondary">
+                    {{ shop.address or 'Chưa có địa chỉ' }}
+                  </small>
+                </td>
+                <td><code>{{ shop.username }}</code></td>
+                <td>{{ shop.orders }}</td>
+                <td class="text-end">
+                  {{ '{:,.0f}'.format(shop.revenue) }} ₫
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="4" class="text-secondary">
+                  Chưa có cửa hàng.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

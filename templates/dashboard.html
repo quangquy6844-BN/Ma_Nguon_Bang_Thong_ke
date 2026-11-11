@@ -1,0 +1,353 @@
+
+
+<div class="page-intro">
+
+    <div>
+        <h2>Xin chào, Quản trị viên 👋</h2>
+        <p>Theo dõi tình hình kinh doanh của bạn tại đây.</p>
+    </div>
+
+    <a href="{% url 'revenues' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i>
+        Thêm doanh thu
+    </a>
+
+</div>
+
+
+<!-- THỐNG KÊ -->
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-3">
+        <div class="metric-card">
+            <p>Tổng doanh thu tháng</p>
+            <h3>86.500.000 đ</h3>
+            <span class="text-success">
+                <i class="bi bi-arrow-up"></i>
+                12,8% so với tháng trước
+            </span>
+        </div>
+    </div>
+
+
+    <div class="col-md-3">
+        <div class="metric-card">
+            <p>Doanh thu hôm nay</p>
+            <h3>3.250.000 đ</h3>
+            <span class="text-muted">Cập nhật trong ngày</span>
+        </div>
+    </div>
+
+
+    <div class="col-md-3">
+        <div class="metric-card">
+            <p>Số giao dịch</p>
+            <h3>248</h3>
+            <span class="text-success">8,2% so với tháng trước</span>
+        </div>
+    </div>
+
+
+    <div class="col-md-3">
+        <div class="metric-card">
+            <p>Doanh thu bình quân</p>
+            <h3>2.883.000 đ</h3>
+            <span class="text-muted">Trên mỗi ngày hoạt động</span>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- BIỂU ĐỒ -->
+
+<div class="row g-3">
+
+   <div class="panel">
+    <div class="revenue-chart-header">
+        <div>
+            <h5>Thống kê doanh thu</h5>
+            <p class="text-muted mb-0" id="revenuePeriodLabel">
+                Doanh thu theo ngày
+            </p>
+        </div>
+
+        <div class="revenue-filters">
+            <select id="revenuePeriod" class="form-select">
+                <option value="day">Theo ngày</option>
+                <option value="month">Theo tháng</option>
+                <option value="year">Theo năm</option>
+            </select>
+
+            <input id="revenueDateFilter" type="date" class="form-control">
+
+            <input id="revenueMonthFilter" type="month"
+                   class="form-control" hidden>
+
+            <input id="revenueYearFilter" type="number"
+                   class="form-control" min="2000" max="2100" hidden>
+        </div>
+    </div>
+
+    <div class="revenue-total">
+        <span>Tổng doanh thu trong kỳ</span>
+        <strong id="revenuePeriodTotal">0 đ</strong>
+    </div>
+
+    <canvas id="revenueChart" height="100"></canvas>
+</div>
+
+
+    <div class="col-lg-4">
+
+        <div class="panel">
+
+            <h5>Phân loại doanh thu</h5>
+
+            <p class="text-muted">
+                Theo nhóm hoạt động
+            </p>
+
+            <canvas id="categoryChart"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- GIAO DỊCH GẦN ĐÂY -->
+
+<div class="panel mt-4">
+
+    <h5>Giao dịch gần đây</h5>
+
+    <div class="table-responsive">
+
+        <table class="table table-hover">
+
+            <thead>
+                <tr>
+                    <th>Ngày</th>
+                    <th>Nội dung</th>
+                    <th>Nhóm doanh thu</th>
+                    <th class="text-end">Số tiền</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>10/11/2026</td>
+                    <td>Bán hàng tại cửa hàng</td>
+                    <td>Bán hàng hóa</td>
+                    <td class="text-end">1.850.000 đ</td>
+                </tr>
+
+                <tr>
+                    <td>10/11/2026</td>
+                    <td>Doanh thu dịch vụ</td>
+                    <td>Dịch vụ</td>
+                    <td class="text-end">900.000 đ</td>
+                </tr>
+
+                <tr>
+                    <td>09/11/2026</td>
+                    <td>Bán hàng cuối ngày</td>
+                    <td>Bán hàng hóa</td>
+                    <td class="text-end">2.400.000 đ</td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const periodSelect = document.getElementById("revenuePeriod");
+    const dateFilter = document.getElementById("revenueDateFilter");
+    const monthFilter = document.getElementById("revenueMonthFilter");
+    const yearFilter = document.getElementById("revenueYearFilter");
+    const totalElement = document.getElementById("revenuePeriodTotal");
+    const labelElement = document.getElementById("revenuePeriodLabel");
+    const canvas = document.getElementById("revenueChart");
+
+    if (!periodSelect || !canvas) return;
+
+    // Dữ liệu mẫu khớp với các giao dịch hiện có trên trang.
+    // Có thể thay bằng dữ liệu do backend truyền vào.
+    const revenues = [
+        { date: "2026-11-10", amount: 1850000, category: "Bán hàng hóa" },
+        { date: "2026-11-10", amount: 900000, category: "Dịch vụ" },
+        { date: "2026-11-09", amount: 2400000, category: "Bán hàng hóa" }
+    ];
+
+    const today = new Date();
+    dateFilter.value = formatDateInput(today);
+    monthFilter.value = formatMonthInput(today);
+    yearFilter.value = String(today.getFullYear());
+
+    const chart = new Chart(canvas, {
+        type: "bar",
+        data: {
+            labels: [],
+            datasets: [{
+                label: "Doanh thu",
+                data: [],
+                backgroundColor: "rgba(101, 88, 211, 0.75)",
+                borderColor: "#6558d3",
+                borderWidth: 1,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: context =>
+                            Number(context.raw).toLocaleString("vi-VN") + " đ"
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: value =>
+                            Number(value).toLocaleString("vi-VN") + " đ"
+                    }
+                }
+            }
+        }
+    });
+
+    function formatDateInput(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    }
+
+    function formatMonthInput(date) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    }
+
+    function formatMoney(amount) {
+        return Number(amount).toLocaleString("vi-VN") + " đ";
+    }
+
+    function updateChart() {
+        const period = periodSelect.value;
+        let filtered;
+        let labels;
+        let values;
+        let title;
+
+        if (period === "day") {
+            const selectedDate = dateFilter.value;
+            filtered = revenues.filter(item => item.date === selectedDate);
+            labels = filtered.map(item => item.category);
+            values = filtered.map(item => item.amount);
+            title = selectedDate
+                ? `Doanh thu ngày ${selectedDate.split("-").reverse().join("/")}`
+                : "Doanh thu theo ngày";
+        } else if (period === "month") {
+            const selectedMonth = monthFilter.value;
+            filtered = revenues.filter(item => item.date.startsWith(selectedMonth));
+            const totals = {};
+
+            filtered.forEach(item => {
+                const day = Number(item.date.slice(8, 10));
+                totals[day] = (totals[day] || 0) + item.amount;
+            });
+
+            labels = Object.keys(totals)
+                .map(Number)
+                .sort((a, b) => a - b)
+                .map(day => `Ngày ${day}`);
+            values = Object.keys(totals)
+                .map(Number)
+                .sort((a, b) => a - b)
+                .map(day => totals[day]);
+            title = selectedMonth
+                ? `Doanh thu tháng ${selectedMonth.split("-").reverse().join("/")}`
+                : "Doanh thu theo tháng";
+        } else {
+            const selectedYear = yearFilter.value;
+            filtered = revenues.filter(item => item.date.startsWith(selectedYear));
+            const totals = Array(12).fill(0);
+
+            filtered.forEach(item => {
+                const month = Number(item.date.slice(5, 7)) - 1;
+                totals[month] += item.amount;
+            });
+
+            labels = [
+                "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4",
+                "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8",
+                "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
+            ];
+            values = totals;
+            title = `Doanh thu năm ${selectedYear}`;
+        }
+
+        chart.data.labels = labels.length ? labels : ["Chưa có dữ liệu"];
+        chart.data.datasets[0].data = labels.length ? values : [0];
+        chart.update();
+
+        const total = filtered.reduce((sum, item) => sum + item.amount, 0);
+        totalElement.textContent = formatMoney(total);
+        labelElement.textContent = title;
+    }
+
+    function updateVisibleFilters() {
+        const period = periodSelect.value;
+        dateFilter.hidden = period !== "day";
+        monthFilter.hidden = period !== "month";
+        yearFilter.hidden = period !== "year";
+        updateChart();
+    }
+
+    periodSelect.addEventListener("change", updateVisibleFilters);
+    dateFilter.addEventListener("change", updateChart);
+    monthFilter.addEventListener("change", updateChart);
+    yearFilter.addEventListener("input", updateChart);
+
+    updateVisibleFilters();
+
+    const categoryCanvas = document.getElementById("categoryChart");
+    if (categoryCanvas) {
+        new Chart(categoryCanvas, {
+            type: "doughnut",
+            data: {
+                labels: ["Bán hàng hóa", "Dịch vụ", "Hoạt động khác"],
+                datasets: [{
+                    data: [4250000, 900000, 0],
+                    backgroundColor: ["#6558d3", "#64a8e8", "#f3a56f"]
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { position: "bottom" }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

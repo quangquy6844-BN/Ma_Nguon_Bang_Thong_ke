@@ -1,0 +1,188 @@
+{% extends 'index.html' %}
+
+{% block title %}Quản trị · Sổ doanh thu{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+  <div>
+    <p class="eyebrow">BẢNG ĐIỀU KHIỂN</p>
+    <h1 class="h2 fw-bold mb-1">Tổng quan hệ thống</h1>
+    <div class="text-secondary">
+      Theo dõi hoạt động của các cửa hàng.
+    </div>
+  </div>
+
+  <a class="btn btn-primary" href="{{ url_for('admin_shops') }}">
+    + Quản lý cửa hàng
+  </a>
+</div>
+
+<form class="card card-body border-0 shadow-sm mb-4" method="get">
+  <div class="row g-2 align-items-end">
+    <div class="col-sm-4 col-lg-3">
+      <label class="form-label">Thống kê theo</label>
+      <select class="form-select" name="period" id="period">
+        <option value="day" {% if period == 'day' %}selected{% endif %}>
+          Ngày
+        </option>
+        <option value="month" {% if period == 'month' %}selected{% endif %}>
+          Tháng
+        </option>
+        <option value="year" {% if period == 'year' %}selected{% endif %}>
+          Năm
+        </option>
+      </select>
+    </div>
+
+    <div class="col-sm-5 col-lg-4">
+      <label class="form-label">Kỳ báo cáo</label>
+      <input
+        class="form-control"
+        id="value"
+        name="value"
+        value="{{ value }}"
+        required
+      >
+    </div>
+
+    <div class="col-sm-3">
+      <button class="btn btn-dark w-100">Xem báo cáo</button>
+    </div>
+  </div>
+</form>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="stat-card">
+      <span>Cửa hàng có phát sinh</span>
+      <strong>{{ totals.shops }}</strong>
+      <small>trong kỳ đã chọn</small>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="stat-card">
+      <span>Số phiếu bán</span>
+      <strong>{{ totals.orders }}</strong>
+      <small>toàn hệ thống</small>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="stat-card">
+      <span>Tổng doanh thu</span>
+      <strong>{{ '{:,.0f}'.format(totals.revenue) }} ₫</strong>
+      <small>trong kỳ đã chọn</small>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <h2 class="h5 fw-bold mb-3">Doanh thu cửa hàng</h2>
+
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>Cửa hàng</th>
+                <th>Phiếu</th>
+                <th class="text-end">Doanh thu</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for shop in shops %}
+              <tr>
+                <td>
+                  <div class="fw-semibold">{{ shop.shop_name }}</div>
+                  <small class="text-secondary">
+                    {{ shop.business or '—' }}
+                  </small>
+                </td>
+                <td>{{ shop.order_count }}</td>
+                <td class="text-end fw-semibold">
+                  {{ '{:,.0f}'.format(shop.revenue) }} ₫
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="3" class="text-secondary">
+                  Chưa có cửa hàng.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <h2 class="h5 fw-bold mb-3">Phiếu bán gần đây</h2>
+
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>Mã bill</th>
+                <th>Cửa hàng</th>
+                <th class="text-end">Tổng tiền</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for sale in recent %}
+              <tr>
+                <td>
+                  <a href="{{ url_for('receipt', sale_id=sale.id) }}">
+                    {{ sale.receipt_no }}
+                  </a>
+                </td>
+                <td>{{ sale.shop_name }}</td>
+                <td class="text-end">
+                  {{ '{:,.0f}'.format(sale.total) }} ₫
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="3" class="text-secondary">
+                  Chưa có giao dịch trong kỳ.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const periodInput = document.querySelector("#period");
+  const valueInput = document.querySelector("#value");
+
+  function updatePeriodInput() {
+    if (periodInput.value === "day") {
+      valueInput.type = "date";
+    } else if (periodInput.value === "month") {
+      valueInput.type = "month";
+    } else {
+      valueInput.type = "number";
+      valueInput.min = "2000";
+      valueInput.max = "2100";
+    }
+  }
+
+  periodInput.addEventListener("change", updatePeriodInput);
+  updatePeriodInput();
+</script>
+{% endblock %}
